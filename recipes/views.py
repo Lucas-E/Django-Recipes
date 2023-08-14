@@ -34,3 +34,31 @@ def recipe(request, id):
         'recipe': recipe,
         'is_detail_page': True,
     })
+
+
+def search_recipes(request):
+    try:
+        terms = request.GET.get('search')
+        if (not terms):
+            raise Exception('Error')
+
+        recipes = Recipe.objects.filter(title__contains=terms)
+
+        if (len(recipes) == 0):
+            raise Exception('Error')
+
+        return render(request, 'recipes/pages/recipes-view.html', context={
+            'recipes': recipes,
+            'code': 200,
+            'terms': terms
+        })
+    except Recipe.DoesNotExist:
+        return render(request, 'recipes/pages/recipes-view.html', context={
+            'code': 404
+        })
+    except Exception as e:
+        return render(request, 'recipes/pages/recipes-view.html', context={
+            'code': 404,
+            'error': e,
+            'terms': terms
+        })

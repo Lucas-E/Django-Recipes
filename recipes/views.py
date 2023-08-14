@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 
 from recipes.models import Recipe
@@ -42,7 +43,9 @@ def search_recipes(request):
         if (not terms):
             raise Exception('Error')
 
-        recipes = Recipe.objects.filter(title__contains=terms)
+        recipes = Recipe.objects.filter(Q(
+            Q(title__contains=terms) | Q(description__contains=terms)
+            ), is_published=True)
 
         if (len(recipes) == 0):
             raise Exception('Error')
